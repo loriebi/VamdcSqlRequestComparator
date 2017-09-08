@@ -1,4 +1,11 @@
 VamdcSqlRequestComparator
+
+VAMDC aims to be an interoperable e-infrastructure that provides the international research community with access to a broad range of atomic and molecular (A&M) data compiled within a set of A&M databases accessible through the provision of this portal and of user software. Furthermore VAMDC aims to provide A&M data providers and compilers with a large dissemination platform for their work.
+
+VAMDC infrastructure was established to provide a service to a wide international research community and has been developed in conjunction with consultations and advice from the A&M user community.
+
+VamdcSqlRequestComparator defines Vamdc grammar. It compares two VamdcSqlRequests.
+
 ===========
 
 File List
