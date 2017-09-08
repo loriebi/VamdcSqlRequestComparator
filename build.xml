@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="VamdcSqlRequestComparator" basedir=".">
+	
+	<property name = "src.dir" value = "src" />
+	<property name = "grammar.dir" value = "grammar" />
+	<property name = "build.dir" value = "build" />
+	<property name = "classes.dir" value = "${build.dir}/classes" />
+	<property name = "lib.dir" value = "lib" />
+	<property name = "jar.dir" value = "${build.dir}/jar" />
+	<property name = "main-class" value = "vamdcsqlcomparator.Main" />
+	
+
+	<path id = "classpath" >
+		<fileset dir = "${lib.dir}" includes="**/*.jar" />
+		<pathelement location="${classes.dir}/grammar"/>
+	</path>
+	
+	<path id = "application" location = "${jar.dir}/${ant.project.name}.jar" />
+		
+	<target name = "build-all" depends = "build,jar" />
+	<target name = "build" depends="antlr,compile" />
+	<target name = "clean-all" depends="clean,antlr-clean" />
+	
+	<target name = "clean">
+		<delete dir = "${build.dir}" />
+	</target>
+	
+	
+	<target name = "run">
+		<java fork = "true" classname = "${main-class}" >
+			<classpath>
+				<path refid = "classpath" />
+				<path refid = "application" />
+ 			</classpath>
+			<arg value="${req1}"/>
+			<arg value="${req2}"/>
+		</java> 
+	</target>
+	
+	<target name = "compile">	
+		<mkdir dir = "${classes.dir}" />
+		<javac srcdir = "${grammar.dir}" destdir = "${classes.dir}" classpathref = "classpath" includeantruntime="false"/>
+		<javac srcdir = "${src.dir}" destdir = "${classes.dir}" classpathref = "classpath" includeantruntime="false"/>
+	</target>
+	
+	
+	<target name = "init-antlr">
+		<echo message="Initialization of Grammar and Antlr path : ${grammar.dir}/VamdcSqlRequest.g4 ${lib.dir}/antlr-4.5.3-complete.jar"/>
+		<!-- Full path to Antlr jar -->
+		<property name="antlr.jar" location = "${lib.dir}/antlr-4.5.3-complete.jar"/>
+		<!-- Grammar path -->
+		<property name="antlr.grammar" location = "${grammar.dir}/VamdcSqlRequest.g4"/>
+	</target>
+	 
+	
+	
+	<target name = "antlr" depends="init-antlr" >
+		<!-- Compiling grammar -->
+		<!--java -jar ${lib.dir}/antlr-4.5.3-complete.jar VamdcSqlRequest.g4 -->
+		<echo message="Compiling grammar -----> ${grammar.dir}/VamdcSqlRequest.g4"/>
+		<java jar="${antlr.jar}" dir="${grammar.dir}"  fork="true">
+			<classpath>
+				<pathelement location="src/VamdcSqlRequest.g4"/>
+				<pathelement path="${java.class.path}"/>
+			</classpath>  
+			<arg value="VamdcSqlRequest.g4" />
+		</java>
+		<copy todir="antlr-gen/vamdcsqlcomparator" >  
+			<fileset dir="${grammar.dir}" includes="*.java"/>  
+		</copy>
+	</target>
+	
+	
+	<target name="antlr-clean">
+	 	<echo message="Deleting grammar files..." />
+		<delete>
+			<fileset dir="${grammar.dir}" casesensitive="yes">
+				<include name="VamdcSqlRequest*.java"/>
+	            <include name="*.tokens"/>
+	        </fileset>
+			<fileset dir="antlr-gen/vamdcsqlcomparator" casesensitive="yes">
+				<include name="VamdcSqlRequest*.java"/>
+			</fileset>
+		</delete>
+	</target>
+	
+	
+	<target name = "jar">
+		<jar destfile = "${jar.dir}/${ant.project.name}.jar" basedir = "${classes.dir}" >  
+			<manifest>
+				<attribute name = "Main-Class" Value = "${main-class}" />
+			</manifest>
+		</jar>
+	</target>
+	
+	
+	
+	<target name = "junit">
+
+	  <junit printsummary="yes" haltonfailure="no">
+
+	  	<classpath>
+	  		<path refid = "classpath" />
+            <path location="${classes.dir}"/>
+        </classpath>
+
+		<batchtest fork="yes" >
+			<fileset dir="${src.dir}">
+				<include name="**/*Test*.java" />
+			</fileset>
+		</batchtest>
+
+	  </junit>
+	</target>
+	
+	<!-- Generate javadocs for current project into ${doc.dir} -->
+	<target name="doc" description="generate documentation">
+		<javadoc  destdir="${build.dir}/doc" classpathref="classpath" >
+			<sourcepath>
+				<path location="${src.dir}" />
+				<path location="antlr-gen" />
+			</sourcepath>
+		</javadoc>
+	</target>
+	
+	
+	
+
+</project>
